@@ -1,0 +1,14 @@
+{
+  "_comment": "Copy this, fill in your real values, and import it through Setup → Trip data → Import file. Do NOT commit the filled-in copy.",
+  "trip": {
+    "_comment": "Only the fields you want to override need to be present; importing replaces the whole trip document, so start from a copy of data/trip-spain-2026.json and fill in the nulls.",
+    "items": [
+      {
+        "id": "beziers-stay",
+        "booking": {
+          "private": { "ref": "0000000000", "pin": "0000", "hostPhone": "+33 0 00 00 00 00" }
+        }
+      }
+    ]
+  }
+}
