@@ -185,7 +185,7 @@ function wireChrome() {
 }
 
 async function onClick(event) {
-  const t = event.target.closest('[data-route],[data-copy],[data-edit],[data-done],[data-add-item],[data-copy-summary],[data-share-summary],[data-print],[data-toggle-private],[data-toggle-paid],[data-ask],[data-clear-chat],[data-export],[data-reload-seed],[data-clear-key],[data-connect],[data-disconnect],[data-accept],[data-dismiss]');
+  const t = event.target.closest('[data-route],[data-copy],[data-edit],[data-done],[data-add-item],[data-copy-summary],[data-share-summary],[data-print],[data-toggle-private],[data-toggle-paid],[data-ask],[data-clear-chat],[data-export],[data-reload-seed],[data-clear-key],[data-connect],[data-disconnect],[data-accept],[data-dismiss],[data-pack-reset],[data-delete-trip]');
   if (!t) return;
   const d = t.dataset;
 
@@ -241,6 +241,13 @@ async function onClick(event) {
     state.chat = [];
     await store.saveChat(state.chat);
     render();
+    return;
+  }
+
+  if ('packReset' in d) {
+    for (const p of state.trip.packing || []) p.packed = false;
+    await persistTrip();
+    toast('Packing list reset');
     return;
   }
 
@@ -333,6 +340,19 @@ async function onChange(event) {
   if (['geminiKey', 'geminiModel', 'googleClientId', 'gmailQuery'].includes(el.id)) {
     state.settings = await store.saveSettings({ [el.id]: el.value.trim() });
     toast('Saved');
+    return;
+  }
+  if (el.dataset?.pack) {
+    const row = (state.trip.packing || []).find((p) => p.id === el.dataset.pack);
+    if (row) {
+      row.packed = el.checked;
+      await store.saveTrip(state.trip);
+      state.trips = await store.loadTrips();
+      // Re-render so the counters and progress bar follow, keeping scroll.
+      const y = window.scrollY;
+      render();
+      window.scrollTo(0, y);
+    }
     return;
   }
   if (el.id === 'importFile' && el.files?.[0]) {

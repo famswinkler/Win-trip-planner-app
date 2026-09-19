@@ -8,30 +8,62 @@
   "homeBase": "Steinhausen, ZG, Switzerland",
   "timezone": "Europe/Zurich",
   "currency": "CHF",
-  "party": { "adults": 2, "children": 2, "childAges": [8, 11] },
+  "party": {
+    "adults": 2,
+    "children": 2,
+    "childAges": [
+      8,
+      11
+    ]
+  },
   "updatedAt": "2026-09-19",
   "sources": [
-    { "kind": "drive", "label": "2026-10 Church ErLäbt Camp Planner", "id": "1hY8jeylHn3YWBnYvhwIQxRuhwL1eXL9AuvWrSZV0tMY" },
-    { "kind": "drive", "label": "RG 21 Winkler.pdf (camp invoice)", "id": "1E07kQcU62Tq_X5BJIVAUoApVxMf-Ia2U" },
-    { "kind": "gmail", "label": "Booking.com — Béziers confirmation", "id": "19e8f7d3325858a3" },
-    { "kind": "gmail", "label": "Booking.com — Novotel Avignon confirmation", "id": "1a0102df2f32cc8d" },
-    { "kind": "gmail", "label": "Novotel Avignon — parking & charging reply", "id": "1a01037697180c02" },
-    { "kind": "calendar", "label": "fam.s.winkler@gmail.com (Oct 2026)", "id": "primary" }
+    {
+      "kind": "drive",
+      "label": "2026-10 Church ErLäbt Camp Planner",
+      "id": "1hY8jeylHn3YWBnYvhwIQxRuhwL1eXL9AuvWrSZV0tMY"
+    },
+    {
+      "kind": "drive",
+      "label": "RG 21 Winkler.pdf (camp invoice)",
+      "id": "1E07kQcU62Tq_X5BJIVAUoApVxMf-Ia2U"
+    },
+    {
+      "kind": "gmail",
+      "label": "Booking.com — Béziers confirmation",
+      "id": "19e8f7d3325858a3"
+    },
+    {
+      "kind": "gmail",
+      "label": "Booking.com — Novotel Avignon confirmation",
+      "id": "1a0102df2f32cc8d"
+    },
+    {
+      "kind": "gmail",
+      "label": "Novotel Avignon — parking & charging reply",
+      "id": "1a01037697180c02"
+    },
+    {
+      "kind": "calendar",
+      "label": "fam.s.winkler@gmail.com (Oct 2026)",
+      "id": "primary"
+    }
   ],
-
   "vehicle": {
     "model": "Tesla Model Y Long Range",
     "heightMetres": 1.62,
     "rangeLoadedKm": "350–380 km at motorway speed, loaded, 10–20% reserve",
     "chargeEveryKm": "250–300 km",
-    "networks": ["Tesla Supercharger", "Electra+ (up to 400 kW)"],
+    "networks": [
+      "Tesla Supercharger",
+      "Electra+ (up to 400 kW)"
+    ],
     "notes": [
       "Plan a stop every 250–300 km rather than running the battery low with four people and luggage aboard.",
       "Tamarit Beach Resort has 4 guest charge points at 22 kW / 32 A.",
       "Charging from the bungalow's own socket is strictly prohibited at the resort."
     ]
   },
-
   "items": [
     {
       "id": "prep-charge",
@@ -45,7 +77,14 @@
         "Check tyre pressure for a fully loaded car.",
         "If a roof box is fitted, measure total height — the Avignon car park limit is 1.80 m."
       ],
-      "tags": ["prep", "car"]
+      "tags": [
+        "prep",
+        "car"
+      ],
+      "mapCoords": {
+        "lat": 47.1975,
+        "lon": 8.4864
+      }
     },
     {
       "id": "d1-depart",
@@ -53,8 +92,16 @@
       "title": "Depart Steinhausen",
       "start": "2026-10-02T08:00:00+02:00",
       "location": "Steinhausen, ZG",
-      "details": ["Departure time is an estimate — check-in in Béziers opens at 16:00 and runs to midnight."],
-      "tags": ["drive"]
+      "details": [
+        "Departure time is an estimate — check-in in Béziers opens at 16:00 and runs to midnight."
+      ],
+      "tags": [
+        "drive"
+      ],
+      "mapCoords": {
+        "lat": 47.1975,
+        "lon": 8.4864
+      }
     },
     {
       "id": "d1-charge-1",
@@ -64,8 +111,17 @@
       "location": "Saint-Julien-en-Genevois, France",
       "legKm": 115,
       "legDuration": "1h 15m",
-      "details": ["First leg out of Switzerland.", "Swiss motorway vignette covers the domestic stretch."],
-      "tags": ["charge"]
+      "details": [
+        "First leg out of Switzerland.",
+        "Swiss motorway vignette covers the domestic stretch."
+      ],
+      "tags": [
+        "charge"
+      ],
+      "mapCoords": {
+        "lat": 46.1439,
+        "lon": 6.0819
+      }
     },
     {
       "id": "d1-charge-2",
@@ -75,8 +131,16 @@
       "location": "Portes-lès-Valence, France",
       "legKm": 180,
       "legDuration": "2h 00m",
-      "details": ["Motorway services — good lunch stop for the children."],
-      "tags": ["charge"]
+      "details": [
+        "Motorway services — good lunch stop for the children."
+      ],
+      "tags": [
+        "charge"
+      ],
+      "mapCoords": {
+        "lat": 44.8747,
+        "lon": 4.8747
+      }
     },
     {
       "id": "beziers-stay",
@@ -85,7 +149,10 @@
       "start": "2026-10-02T16:00:00+02:00",
       "end": "2026-10-03T11:00:00+02:00",
       "location": "16 Rue des 2 Frères, 34500 Béziers, France",
-      "coords": { "lat": 43.340333, "lon": 3.220017 },
+      "coords": {
+        "lat": 43.340333,
+        "lon": 3.220017
+      },
       "legKm": 240,
       "legDuration": "2h 30m",
       "booking": {
@@ -104,7 +171,11 @@
         "paid": false,
         "paymentNote": "Booking.com charges the card automatically — nothing to pay at the property.",
         "cancellation": "Free until 30 September 2026 23:59. From 1 October 00:00 the fee is € 86.72.",
-        "private": { "ref": null, "pin": null, "hostPhone": null }
+        "private": {
+          "ref": null,
+          "pin": null,
+          "hostPhone": null
+        }
       },
       "details": [
         "Second floor, no lift — pack so the bags can be carried up in one or two trips.",
@@ -112,7 +183,14 @@
         "The host sends entry instructions by email before arrival.",
         "Damage policy: up to € 500 chargeable after check-out."
       ],
-      "tags": ["stay", "france"]
+      "tags": [
+        "stay",
+        "france"
+      ],
+      "mapCoords": {
+        "lat": 43.340333,
+        "lon": 3.220017
+      }
     },
     {
       "id": "beziers-dinner",
@@ -124,7 +202,13 @@
         "Biocoop Béziers for organic plant-based groceries to cook in the apartment.",
         "If eating out: ask explicitly for no pork and no lard in the dish."
       ],
-      "tags": ["food"]
+      "tags": [
+        "food"
+      ],
+      "mapCoords": {
+        "lat": 43.3403,
+        "lon": 3.22
+      }
     },
     {
       "id": "d2-charge-1",
@@ -134,8 +218,16 @@
       "location": "Narbonne, France",
       "legKm": 95,
       "legDuration": "1h 05m",
-      "details": ["Last French charge before the Spanish border."],
-      "tags": ["charge"]
+      "details": [
+        "Last French charge before the Spanish border."
+      ],
+      "tags": [
+        "charge"
+      ],
+      "mapCoords": {
+        "lat": 43.184,
+        "lon": 3.0036
+      }
     },
     {
       "id": "d2-charge-2",
@@ -145,8 +237,16 @@
       "location": "Torredembarra, Spain",
       "legKm": 185,
       "legDuration": "2h 00m",
-      "details": ["Arrive at camp with a usable charge — resort chargers are only 22 kW."],
-      "tags": ["charge"]
+      "details": [
+        "Arrive at camp with a usable charge — resort chargers are only 22 kW."
+      ],
+      "tags": [
+        "charge"
+      ],
+      "mapCoords": {
+        "lat": 41.1465,
+        "lon": 1.399
+      }
     },
     {
       "id": "camp",
@@ -155,7 +255,10 @@
       "start": "2026-10-03T15:00:00+02:00",
       "end": "2026-10-10T11:00:00+02:00",
       "location": "Camí de Tamarit, Tarragona, Spain",
-      "coords": { "lat": 41.132, "lon": 1.362 },
+      "coords": {
+        "lat": 41.132,
+        "lon": 1.362
+      },
       "legKm": 20,
       "legDuration": "0h 25m",
       "booking": {
@@ -166,8 +269,13 @@
         "paidChf": 600,
         "outstandingChf": 350,
         "paymentNote": "Deposit of CHF 600 paid. Final invoice was promised for September 2026 — chase it if it has not arrived.",
-        "contacts": ["Jonathan — invoice questions", "Nina — general camp questions"],
-        "private": { "iban": null }
+        "contacts": [
+          "Jonathan — invoice questions",
+          "Nina — general camp questions"
+        ],
+        "private": {
+          "iban": null
+        }
       },
       "details": [
         "Self-catering: cook in the Bungalow NOA kitchen.",
@@ -176,7 +284,15 @@
         "4 EV charge points on site, 22 kW / 32 A. Charging at the bungalow is prohibited.",
         "Insurance is each participant's own responsibility."
       ],
-      "tags": ["stay", "spain", "camp"]
+      "tags": [
+        "stay",
+        "spain",
+        "camp"
+      ],
+      "mapCoords": {
+        "lat": 41.132,
+        "lon": 1.362
+      }
     },
     {
       "id": "veritas-run",
@@ -189,7 +305,14 @@
         "Largest organic chain in Catalonia — Demeter and biodynamic lines.",
         "Stock the week in one trip; the resort shop covers top-ups only."
       ],
-      "tags": ["food", "shop"]
+      "tags": [
+        "food",
+        "shop"
+      ],
+      "mapCoords": {
+        "lat": 41.1189,
+        "lon": 1.2445
+      }
     },
     {
       "id": "r1-depart",
@@ -197,8 +320,16 @@
       "title": "Depart Tamarit for Avignon",
       "start": "2026-10-10T10:00:00+02:00",
       "location": "Tamarit Beach Resort",
-      "details": ["Start the day at about 80% charge."],
-      "tags": ["drive"]
+      "details": [
+        "Start the day at about 80% charge."
+      ],
+      "tags": [
+        "drive"
+      ],
+      "mapCoords": {
+        "lat": 41.132,
+        "lon": 1.362
+      }
     },
     {
       "id": "r1-charge-1",
@@ -208,7 +339,13 @@
       "location": "Rivesaltes, France",
       "legKm": 260,
       "legDuration": "2h 45m",
-      "tags": ["charge"]
+      "tags": [
+        "charge"
+      ],
+      "mapCoords": {
+        "lat": 42.77,
+        "lon": 2.872
+      }
     },
     {
       "id": "avignon-stay",
@@ -217,7 +354,10 @@
       "start": "2026-10-10T15:00:00+02:00",
       "end": "2026-10-12T12:00:00+02:00",
       "location": "20 boulevard Saint Roch, 84000 Avignon, France",
-      "coords": { "lat": 43.943, "lon": 4.807 },
+      "coords": {
+        "lat": 43.943,
+        "lon": 4.807
+      },
       "phone": "+33 4 32 74 70 10",
       "legKm": 270,
       "legDuration": "2h 50m",
@@ -228,20 +368,34 @@
         "checkInWindow": "15:00 – 23:30",
         "checkOutWindow": "07:00 – 12:00",
         "totalEur": 403.55,
-        "priceBreakdown": ["Room € 356.86", "VAT € 35.69", "City tax € 11.00"],
+        "priceBreakdown": [
+          "Room € 356.86",
+          "VAT € 35.69",
+          "City tax € 11.00"
+        ],
         "paid": true,
         "paidEur": 392.55,
-        "dueAtPropertyEur": 11.0,
+        "dueAtPropertyEur": 11,
         "paymentNote": "€ 392.55 already paid through Booking.com. € 11.00 city tax (€ 2.75 per person per night) is collected at the property.",
         "cancellation": "Non-refundable. Date changes are not possible.",
-        "private": { "ref": null, "pin": null }
+        "private": {
+          "ref": null,
+          "pin": null
+        }
       },
       "details": [
         "Breakfast is included, and free for children under 16.",
         "Photo ID and a credit card are required at check-in.",
         "Guests under 18 can only check in with a parent or guardian."
       ],
-      "tags": ["stay", "france"]
+      "tags": [
+        "stay",
+        "france"
+      ],
+      "mapCoords": {
+        "lat": 43.943,
+        "lon": 4.807
+      }
     },
     {
       "id": "avignon-parking",
@@ -255,8 +409,19 @@
         "Charging on site costs € 15 per charge.",
         "The car park is reachable before check-in, with a lift up to reception."
       ],
-      "tags": ["car", "money"],
-      "source": { "kind": "gmail", "id": "1a01037697180c02", "label": "Reply from Novotel reception, 17 Aug 2026" }
+      "tags": [
+        "car",
+        "money"
+      ],
+      "source": {
+        "kind": "gmail",
+        "id": "1a01037697180c02",
+        "label": "Reply from Novotel reception, 17 Aug 2026"
+      },
+      "mapCoords": {
+        "lat": 43.943,
+        "lon": 4.807
+      }
     },
     {
       "id": "avignon-day",
@@ -264,8 +429,17 @@
       "title": "Avignon sightseeing day",
       "start": "2026-10-11T09:30:00+02:00",
       "location": "Avignon old town",
-      "details": ["Budget allows about CHF 50 for local sightseeing.", "Sabbath runs Friday 18:00 to Saturday 18:00 — this is a Sunday."],
-      "tags": ["activity"]
+      "details": [
+        "Budget allows about CHF 50 for local sightseeing.",
+        "Sabbath runs Friday 18:00 to Saturday 18:00 — this is a Sunday."
+      ],
+      "tags": [
+        "activity"
+      ],
+      "mapCoords": {
+        "lat": 43.9493,
+        "lon": 4.8055
+      }
     },
     {
       "id": "r2-charge-1",
@@ -275,8 +449,16 @@
       "location": "Avignon, France",
       "legKm": 5,
       "legDuration": "0h 15m",
-      "details": ["Top up before the long run north if you did not charge at the hotel."],
-      "tags": ["charge"]
+      "details": [
+        "Top up before the long run north if you did not charge at the hotel."
+      ],
+      "tags": [
+        "charge"
+      ],
+      "mapCoords": {
+        "lat": 43.943,
+        "lon": 4.807
+      }
     },
     {
       "id": "r2-charge-2",
@@ -286,7 +468,13 @@
       "location": "Valence, France",
       "legKm": 120,
       "legDuration": "1h 15m",
-      "tags": ["charge"]
+      "tags": [
+        "charge"
+      ],
+      "mapCoords": {
+        "lat": 44.9333,
+        "lon": 4.8917
+      }
     },
     {
       "id": "r2-charge-3",
@@ -296,8 +484,16 @@
       "location": "Geneva, Switzerland",
       "legKm": 200,
       "legDuration": "2h 15m",
-      "details": ["Back in Switzerland — French tolls end here."],
-      "tags": ["charge"]
+      "details": [
+        "Back in Switzerland — French tolls end here."
+      ],
+      "tags": [
+        "charge"
+      ],
+      "mapCoords": {
+        "lat": 46.2044,
+        "lon": 6.1432
+      }
     },
     {
       "id": "r2-charge-4",
@@ -307,7 +503,13 @@
       "location": "Obfelden, Switzerland",
       "legKm": 280,
       "legDuration": "3h 00m",
-      "tags": ["charge"]
+      "tags": [
+        "charge"
+      ],
+      "mapCoords": {
+        "lat": 47.2789,
+        "lon": 8.4114
+      }
     },
     {
       "id": "r2-home",
@@ -317,10 +519,15 @@
       "location": "Steinhausen, ZG",
       "legKm": 35,
       "legDuration": "0h 40m",
-      "tags": ["drive"]
+      "tags": [
+        "drive"
+      ],
+      "mapCoords": {
+        "lat": 47.1975,
+        "lon": 8.4864
+      }
     }
   ],
-
   "deadlines": [
     {
       "id": "dl-beziers-cancel",
@@ -351,31 +558,110 @@
       "detail": "The Avignon underground car park is limited to 1.80 m. A bare Model Y is about 1.62 m; a roof box will not fit."
     }
   ],
-
   "budget": [
-    { "label": "Béziers stopover", "detail": "Booked, charged automatically (€ 146.56)", "chf": 142, "status": "due" },
-    { "label": "Church camp balance", "detail": "CHF 950 total, CHF 600 deposit paid", "chf": 350, "status": "due" },
-    { "label": "Avignon, Novotel", "detail": "€ 392.55 already paid", "chf": 375, "status": "paid" },
-    { "label": "Avignon city tax", "detail": "€ 11.00 collected at the property", "chf": 11, "status": "due" },
-    { "label": "Avignon parking", "detail": "€ 14 per night × 2", "chf": 27, "status": "due" },
-    { "label": "Avignon charging", "detail": "€ 15 per charge at the hotel, optional", "chf": 14, "status": "optional" },
-    { "label": "EV charging en route", "detail": "≈ 2,300 km at 18 kWh/100 km, CHF 0.48/kWh", "chf": 200, "status": "due" },
-    { "label": "Motorway tolls", "detail": "France; Switzerland covered by the vignette", "chf": 140, "status": "due" },
-    { "label": "Bip&Go fees", "detail": "€ 10 activation, ≈ € 10 shipping, monthly usage", "chf": 25, "status": "due" },
-    { "label": "Food and groceries", "detail": "Camp self-catering plus travel days", "chf": 650, "status": "due" },
-    { "label": "Activities", "detail": "Avignon sightseeing", "chf": 50, "status": "due" }
+    {
+      "label": "Béziers stopover",
+      "detail": "Booked, charged automatically (€ 146.56)",
+      "chf": 142,
+      "status": "due"
+    },
+    {
+      "label": "Church camp balance",
+      "detail": "CHF 950 total, CHF 600 deposit paid",
+      "chf": 350,
+      "status": "due"
+    },
+    {
+      "label": "Avignon, Novotel",
+      "detail": "€ 392.55 already paid",
+      "chf": 375,
+      "status": "paid"
+    },
+    {
+      "label": "Avignon city tax",
+      "detail": "€ 11.00 collected at the property",
+      "chf": 11,
+      "status": "due"
+    },
+    {
+      "label": "Avignon parking",
+      "detail": "€ 14 per night × 2",
+      "chf": 27,
+      "status": "due"
+    },
+    {
+      "label": "Avignon charging",
+      "detail": "€ 15 per charge at the hotel, optional",
+      "chf": 14,
+      "status": "optional"
+    },
+    {
+      "label": "EV charging en route",
+      "detail": "≈ 2,300 km at 18 kWh/100 km, CHF 0.48/kWh",
+      "chf": 200,
+      "status": "due"
+    },
+    {
+      "label": "Motorway tolls",
+      "detail": "France; Switzerland covered by the vignette",
+      "chf": 140,
+      "status": "due"
+    },
+    {
+      "label": "Bip&Go fees",
+      "detail": "€ 10 activation, ≈ € 10 shipping, monthly usage",
+      "chf": 25,
+      "status": "due"
+    },
+    {
+      "label": "Food and groceries",
+      "detail": "Camp self-catering plus travel days",
+      "chf": 650,
+      "status": "due"
+    },
+    {
+      "label": "Activities",
+      "detail": "Avignon sightseeing",
+      "chf": 50,
+      "status": "due"
+    }
   ],
-
   "contacts": [
-    { "name": "SleepNTrip Béziers (host)", "role": "Stopover apartment", "phone": null, "private": true },
-    { "name": "Novotel Avignon Centre", "role": "Return stay", "phone": "+33 4 32 74 70 10" },
-    { "name": "Church ErLäbt", "role": "Camp organiser, Riedstrasse 13, 6330 Cham", "web": "https://www.churcherlaebt.ch" },
-    { "name": "Jonathan", "role": "Camp invoice questions" },
-    { "name": "Nina", "role": "General camp questions" },
-    { "name": "Emergency (EU)", "role": "Police, fire, ambulance in France and Spain", "phone": "112" },
-    { "name": "TCS ETI (CH)", "role": "Breakdown and travel assistance", "phone": "+41 58 827 22 20" }
+    {
+      "name": "SleepNTrip Béziers (host)",
+      "role": "Stopover apartment",
+      "phone": null,
+      "private": true
+    },
+    {
+      "name": "Novotel Avignon Centre",
+      "role": "Return stay",
+      "phone": "+33 4 32 74 70 10"
+    },
+    {
+      "name": "Church ErLäbt",
+      "role": "Camp organiser, Riedstrasse 13, 6330 Cham",
+      "web": "https://www.churcherlaebt.ch"
+    },
+    {
+      "name": "Jonathan",
+      "role": "Camp invoice questions"
+    },
+    {
+      "name": "Nina",
+      "role": "General camp questions"
+    },
+    {
+      "name": "Emergency (EU)",
+      "role": "Police, fire, ambulance in France and Spain",
+      "phone": "112"
+    },
+    {
+      "name": "TCS ETI (CH)",
+      "role": "Breakdown and travel assistance",
+      "phone": "+41 58 827 22 20"
+    }
   ],
-
   "guides": [
     {
       "id": "g-tolls",
@@ -417,5 +703,169 @@
         "A small daypack for outings, reusable water bottles, chargers, toiletries and medication."
       ]
     }
-  ]
+  ],
+  "packing": [
+    {
+      "id": "pk-01",
+      "category": "Clothing",
+      "label": "Layers: t-shirts, light sweaters, cardigans",
+      "qty": 4,
+      "packed": false
+    },
+    {
+      "id": "pk-02",
+      "category": "Clothing",
+      "label": "Light or medium jacket / windbreaker for the evenings",
+      "qty": 4,
+      "packed": false
+    },
+    {
+      "id": "pk-03",
+      "category": "Clothing",
+      "label": "Rain jacket or compact umbrella (October is the wettest month)",
+      "qty": 4,
+      "packed": false
+    },
+    {
+      "id": "pk-04",
+      "category": "Clothing",
+      "label": "Comfortable walking shoes",
+      "qty": 4,
+      "packed": false
+    },
+    {
+      "id": "pk-05",
+      "category": "Clothing",
+      "label": "Swimwear",
+      "qty": 4,
+      "packed": false
+    },
+    {
+      "id": "pk-06",
+      "category": "Clothing",
+      "label": "Lounge wear for the bungalow",
+      "qty": 4,
+      "packed": false
+    },
+    {
+      "id": "pk-07",
+      "category": "Health",
+      "label": "Personal toiletries",
+      "qty": null,
+      "packed": false
+    },
+    {
+      "id": "pk-08",
+      "category": "Health",
+      "label": "Any regular medication",
+      "qty": null,
+      "packed": false
+    },
+    {
+      "id": "pk-09",
+      "category": "Health",
+      "label": "Sun protection: sunglasses, hat, sunscreen",
+      "qty": null,
+      "packed": false
+    },
+    {
+      "id": "pk-10",
+      "category": "Health",
+      "label": "European Health Insurance Card / travel insurance details",
+      "qty": null,
+      "packed": false
+    },
+    {
+      "id": "pk-11",
+      "category": "Documents",
+      "label": "Passports or ID cards for all four",
+      "qty": 4,
+      "packed": false
+    },
+    {
+      "id": "pk-12",
+      "category": "Documents",
+      "label": "Driving licence and vehicle papers",
+      "qty": null,
+      "packed": false
+    },
+    {
+      "id": "pk-13",
+      "category": "Documents",
+      "label": "Printed copy of the trip summary",
+      "qty": null,
+      "packed": false
+    },
+    {
+      "id": "pk-14",
+      "category": "Car",
+      "label": "Tesla charge cable and Type 2 adapter",
+      "qty": null,
+      "packed": false
+    },
+    {
+      "id": "pk-15",
+      "category": "Car",
+      "label": "Bip&Go or Telepass toll badge",
+      "qty": null,
+      "packed": false
+    },
+    {
+      "id": "pk-16",
+      "category": "Car",
+      "label": "Warning triangle and hi-vis vests (required in France and Spain)",
+      "qty": null,
+      "packed": false
+    },
+    {
+      "id": "pk-17",
+      "category": "Car",
+      "label": "Phone mounts and car chargers",
+      "qty": null,
+      "packed": false
+    },
+    {
+      "id": "pk-18",
+      "category": "Camp",
+      "label": "Reusable water bottles",
+      "qty": 4,
+      "packed": false
+    },
+    {
+      "id": "pk-19",
+      "category": "Camp",
+      "label": "Small daypack for outings",
+      "qty": null,
+      "packed": false
+    },
+    {
+      "id": "pk-20",
+      "category": "Camp",
+      "label": "Device chargers and a multi-socket",
+      "qty": null,
+      "packed": false
+    },
+    {
+      "id": "pk-21",
+      "category": "Camp",
+      "label": "Beach towels",
+      "qty": 4,
+      "packed": false
+    },
+    {
+      "id": "pk-22",
+      "category": "Kitchen",
+      "label": "Basic pantry staples for self-catering",
+      "qty": null,
+      "packed": false
+    },
+    {
+      "id": "pk-23",
+      "category": "Kitchen",
+      "label": "Reusable shopping bags for the Veritas run",
+      "qty": null,
+      "packed": false
+    }
+  ],
+  "mapNote": "Route coordinates are town-level and are used to draw the map only. Tap a stop to open it in Apple or Google Maps for real navigation."
 }

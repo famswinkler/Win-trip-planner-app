@@ -323,6 +323,200 @@ export function renderAsk(state) {
     </div>`;
 }
 
+// ---------------------------------------------------------------------------
+// Packing
+
+export function renderPack(state) {
+  const { trip } = state;
+  const list = trip.packing || [];
+  if (!list.length) return EMPTY;
+
+  const done = list.filter((p) => p.packed).length;
+  const pct = Math.round((done / list.length) * 100);
+
+  const groups = new Map();
+  for (const item of list) {
+    const key = item.category || 'Other';
+    if (!groups.has(key)) groups.set(key, []);
+    groups.get(key).push(item);
+  }
+
+  const sections = [...groups].map(([category, items]) => {
+    const packedHere = items.filter((i) => i.packed).length;
+    return `
+      <section class="card">
+        <div class="card-head">
+          <h2>${esc(category)}</h2><span class="spacer"></span>
+          <span class="chip${packedHere === items.length ? ' ok' : ''}">${packedHere}/${items.length}</span>
+        </div>
+        <ul class="plain checklist">
+          ${items.map((i) => `
+            <li>
+              <label>
+                <input type="checkbox" data-pack="${esc(i.id)}"${i.packed ? ' checked' : ''}>
+                <span class="${i.packed ? 'is-packed' : ''}">${esc(i.label)}${i.qty ? ` <span class="muted small">× ${i.qty}</span>` : ''}</span>
+              </label>
+            </li>`).join('')}
+        </ul>
+      </section>`;
+  });
+
+  return `
+    <section class="card">
+      <div class="card-head"><h2>Packing</h2><span class="spacer"></span>
+        <span class="chip${pct === 100 ? ' ok' : ''}">${done} of ${list.length}</span>
+      </div>
+      <div class="meter" role="img" aria-label="${pct} percent packed">
+        <span style="width:${pct}%"></span>
+      </div>
+      <div class="btn-row" style="margin-top:.8rem">
+        <button class="btn small ghost" data-pack-reset type="button">Uncheck all</button>
+      </div>
+    </section>
+    ${sections.join('')}`;
+}
+
+// ---------------------------------------------------------------------------
+// Map
+//
+// Drawn as inline SVG from the trip's own coordinates rather than with a tile
+// library. Tiles need the network, which is exactly what this app assumes it
+// will not have; a route diagram works in a tunnel. Real navigation is handed
+// off to Apple or Google Maps through the links under each stop.
+
+const MAP_W = 1000;
+const MAP_H = 620;
+const MAP_PAD = 60;
+
+function projectRoute(points) {
+  const lats = points.map((p) => p.lat);
+  const lons = points.map((p) => p.lon);
+  const minLat = Math.min(...lats);
+  const maxLat = Math.max(...lats);
+  const minLon = Math.min(...lons);
+  const maxLon = Math.max(...lons);
+
+  // Equirectangular, with longitude squeezed by cos(latitude) so the shape is
+  // not stretched sideways at Alpine latitudes.
+  const midLat = (minLat + maxLat) / 2;
+  const kx = Math.cos((midLat * Math.PI) / 180);
+  const spanX = Math.max((maxLon - minLon) * kx, 1e-6);
+  const spanY = Math.max(maxLat - minLat, 1e-6);
+  const scale = Math.min((MAP_W - 2 * MAP_PAD) / spanX, (MAP_H - 2 * MAP_PAD) / spanY);
+
+  const offsetX = (MAP_W - spanX * scale) / 2;
+  const offsetY = (MAP_H - spanY * scale) / 2;
+
+  return points.map((p) => ({
+    ...p,
+    x: offsetX + (p.lon - minLon) * kx * scale,
+    y: offsetY + (maxLat - p.lat) * scale,   // SVG y grows downward
+  }));
+}
+
+export function renderMap(state) {
+  const { trip } = state;
+  const tz = trip.timezone || 'Europe/Zurich';
+
+  const withCoords = [...(trip.items || [])]
+    .sort(byStart)
+    .map((i) => {
+      const c = i.mapCoords || i.coords;
+      return c ? { id: i.id, title: i.title, type: i.type, lat: c.lat, lon: c.lon, item: i } : null;
+    })
+    .filter(Boolean);
+
+  if (withCoords.length < 2) {
+    return `<section class="card"><p class="muted">Add coordinates to at least two stops to draw the route.</p></section>`;
+  }
+
+  // Collapse consecutive stops at the same place so the line does not double
+  // back on itself. Where two collapse together, keep the more significant one
+  // — otherwise an overnight stay loses its label to a note filed minutes
+  // earlier at the same address.
+  const RANK = { stay: 3, charge: 2 };
+  const rank = (p) => RANK[p.type] || 1;
+  const path = [];
+  for (const p of withCoords) {
+    const last = path[path.length - 1];
+    if (last && Math.abs(last.lat - p.lat) < 0.01 && Math.abs(last.lon - p.lon) < 0.01) {
+      if (rank(p) > rank(last)) path[path.length - 1] = p;
+      continue;
+    }
+    path.push(p);
+  }
+
+  const pts = projectRoute(path);
+  const line = pts.map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x.toFixed(1)},${p.y.toFixed(1)}`).join(' ');
+
+  const markers = pts.map((p) => {
+    const isStay = p.type === 'stay';
+    const r = isStay ? 11 : 6;
+    const cls = isStay ? 'm-stay' : p.type === 'charge' ? 'm-charge' : 'm-other';
+    return `<circle class="${cls}" cx="${p.x.toFixed(1)}" cy="${p.y.toFixed(1)}" r="${r}">
+      <title>${esc(p.title)}</title></circle>`;
+  }).join('');
+
+  // Label the overnight stops only; labelling every charger is unreadable.
+  const labels = pts.filter((p) => p.type === 'stay').map((p) => {
+    const anchor = p.x > MAP_W * 0.72 ? 'end' : 'start';
+    const dx = anchor === 'end' ? -16 : 16;
+    return `<text class="m-label" x="${(p.x + dx).toFixed(1)}" y="${(p.y + 5).toFixed(1)}" text-anchor="${anchor}">${esc(shortPlace(p.title))}</text>`;
+  }).join('');
+
+  const totalKm = (trip.items || []).reduce((sum, i) => sum + (Number(i.legKm) || 0), 0);
+
+  const stopRows = withCoords.map(({ item }) => {
+    const links = mapLinks(item);
+    return `
+      <tr>
+        <td>
+          <strong>${esc(item.title)}</strong>
+          ${item.location ? `<br><span class="muted small">${esc(item.location)}</span>` : ''}
+        </td>
+        <td class="num">${item.legKm ? `${item.legKm} km` : ''}</td>
+        <td class="num">${links ? `<a class="btn small ghost" href="${esc(links.google)}" target="_blank" rel="noopener">Open</a>` : ''}</td>
+      </tr>`;
+  }).join('');
+
+  return `
+    <section class="card">
+      <div class="card-head"><h2>Route</h2><span class="spacer"></span>
+        <span class="chip">${esc(fmtDayShort(trip.start, tz))} – ${esc(fmtDayShort(trip.end, tz))}</span>
+        ${totalKm ? `<span class="chip">${totalKm.toLocaleString('de-CH')} km</span>` : ''}
+      </div>
+      <svg class="routemap" viewBox="0 0 ${MAP_W} ${MAP_H}" role="img"
+           aria-label="Route from ${esc(shortPlace(pts[0].title))} to ${esc(shortPlace(pts[pts.length - 1].title))}">
+        <path class="m-route" d="${line}" fill="none" />
+        ${markers}
+        ${labels}
+      </svg>
+      <p class="map-legend">
+        <span class="key k-stay"></span> overnight
+        <span class="key k-charge"></span> charge
+        <span class="key k-other"></span> other stop
+      </p>
+      <p class="muted small">${esc(trip.mapNote || 'Drawn offline from saved coordinates.')}</p>
+    </section>
+
+    <p class="eyebrow">Stops in order</p>
+    <section class="card">
+      <table class="grid">
+        <thead><tr><th>Stop</th><th class="num">Leg</th><th class="num">Map</th></tr></thead>
+        <tbody>${stopRows}</tbody>
+      </table>
+    </section>`;
+}
+
+/** Trim a long item title down to something that fits beside a marker. */
+function shortPlace(title) {
+  return String(title)
+    .replace(/^(Supercharger|Stay at|Depart)\s*[\u2014-]?\s*/i, '')
+    .split(/[\u2014(,]/)[0]
+    .trim()
+    .slice(0, 26);
+}
+
 export function renderSettings(state) {
   const { settings, sync, storage, trip, trips, online } = state;
   const last = sync?.lastSync ? new Date(sync.lastSync).toLocaleString('en-GB') : 'never';
@@ -475,6 +669,8 @@ export function toLocalInput(value) {
 export const VIEWS = {
   now: { title: 'Now', render: renderNow },
   plan: { title: 'Plan', render: renderPlan },
+  map: { title: 'Route', render: renderMap },
+  pack: { title: 'Packing', render: renderPack },
   bookings: { title: 'Bookings', render: renderBookings },
   money: { title: 'Money', render: renderMoney },
   summary: { title: 'Summary', render: renderSummary },

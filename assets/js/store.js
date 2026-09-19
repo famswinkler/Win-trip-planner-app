@@ -1,3 +1,5 @@
+import { resolveModel, DEFAULT_MODEL } from './gemini.js';
+
 // Persistence layer.
 //
 // Everything the app shows is read from here, never straight from the network.
@@ -162,7 +164,7 @@ export const DEFAULT_SETTINGS = {
   sunlight: false,        // high-contrast mode for bright daylight
   textScale: 'normal',    // normal | large | xlarge
   geminiKey: '',
-  geminiModel: 'gemini-2.5-flash',
+  geminiModel: DEFAULT_MODEL,
   googleClientId: '',
   autoSync: true,
   gmailQuery: '',
@@ -170,7 +172,10 @@ export const DEFAULT_SETTINGS = {
 
 export async function loadSettings() {
   const stored = await get(KEYS.settings, {});
-  return { ...DEFAULT_SETTINGS, ...stored };
+  const merged = { ...DEFAULT_SETTINGS, ...stored };
+  // Upgrade a model id the API no longer serves, so an old install keeps working.
+  merged.geminiModel = resolveModel(merged.geminiModel);
+  return merged;
 }
 
 export async function saveSettings(patch) {

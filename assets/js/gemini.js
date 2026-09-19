@@ -10,6 +10,32 @@
 
 const ENDPOINT = 'https://generativelanguage.googleapis.com/v1beta/models';
 
+/** Verified working against the live API on 19 September 2026. */
+export const DEFAULT_MODEL = 'gemini-3.6-flash';
+
+/**
+ * Models the API now refuses for new keys. A stored setting naming one of
+ * these is upgraded on load, so an existing install does not silently break.
+ */
+export const RETIRED_MODELS = new Set([
+  'gemini-1.5-flash', 'gemini-1.5-pro',
+  'gemini-2.0-flash', 'gemini-2.0-flash-exp',
+  'gemini-2.5-flash', 'gemini-2.5-pro',
+]);
+
+export function resolveModel(name) {
+  if (!name || RETIRED_MODELS.has(name)) return DEFAULT_MODEL;
+  return name;
+}
+
+/**
+ * Current Gemini models spend "thinking" tokens out of the same budget as the
+ * reply. A short three-bullet answer measured 838 thinking tokens against 88
+ * of output, so a 1,200 budget truncates ordinary questions. Hence the
+ * generous ceiling.
+ */
+const MAX_OUTPUT_TOKENS = 4000;
+
 const SYSTEM_PROMPT = `You are the travel assistant inside an offline-first trip app.
 
 Rules:
@@ -40,7 +66,7 @@ export class GeminiError extends Error {
  * @param {AbortSignal} [opts.signal]
  * @returns {Promise<string>} the reply text
  */
-export async function askGemini({ apiKey, model = 'gemini-2.5-flash', context, history = [], question, signal }) {
+export async function askGemini({ apiKey, model = DEFAULT_MODEL, context, history = [], question, signal }) {
   if (!apiKey) throw new GeminiError('Add a Gemini API key in Setup to use the assistant.');
   if (!navigator.onLine) throw new GeminiError('You are offline. Your question is saved and will send when you reconnect.', { retryable: true });
 
@@ -55,7 +81,7 @@ export async function askGemini({ apiKey, model = 'gemini-2.5-flash', context, h
   const body = {
     systemInstruction: { parts: [{ text: `${SYSTEM_PROMPT}\n\n=== TRIP DATA ===\n${context}` }] },
     contents,
-    generationConfig: { temperature: 0.3, maxOutputTokens: 1200, topP: 0.9 },
+    generationConfig: { temperature: 0.3, maxOutputTokens: MAX_OUTPUT_TOKENS, topP: 0.9 },
     safetySettings: [],
   };
 
@@ -73,6 +99,10 @@ export async function askGemini({ apiKey, model = 'gemini-2.5-flash', context, h
   }
 
   if (res.status === 429) throw new GeminiError('Gemini rate limit reached. Try again in a moment.', { retryable: true });
+  if (res.status === 503) throw new GeminiError('Gemini is busy right now. Try again in a moment.', { retryable: true });
+  if (res.status === 404) {
+    throw new GeminiError(`The model "${model}" is not available on this key. Set it to ${DEFAULT_MODEL} in Setup.`);
+  }
   if (res.status === 400 || res.status === 403) {
     let detail = '';
     try { detail = (await res.json())?.error?.message || ''; } catch { /* no body */ }
@@ -94,9 +124,12 @@ export async function askGemini({ apiKey, model = 'gemini-2.5-flash', context, h
 
   if (!text) {
     if (candidate?.finishReason === 'MAX_TOKENS') {
-      throw new GeminiError('The answer was cut off. Try a narrower question.');
+      throw new GeminiError('The model used its whole budget thinking and produced no answer. Try a narrower question.');
     }
     throw new GeminiError('Gemini returned an empty answer.');
+  }
+  if (candidate?.finishReason === 'MAX_TOKENS') {
+    return `${text}\n\n[cut off — ask a narrower question for the rest]`;
   }
   return text;
 }

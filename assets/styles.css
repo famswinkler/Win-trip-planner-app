@@ -186,7 +186,7 @@ a { color: var(--accent); }
 
 .tabbar {
   position: fixed; left: 0; right: 0; bottom: 0; z-index: 20;
-  display: grid; grid-template-columns: repeat(5, 1fr);
+  display: grid; grid-template-columns: repeat(6, 1fr);
   padding: .3rem max(.25rem, var(--safe-r)) calc(.3rem + var(--safe-b)) max(.25rem, var(--safe-l));
   background: color-mix(in srgb, var(--bg) 88%, transparent);
   backdrop-filter: saturate(180%) blur(14px);
@@ -197,12 +197,13 @@ a { color: var(--accent); }
   display: flex; flex-direction: column; align-items: center; gap: .1rem;
   min-height: var(--tap); padding: .35rem .2rem;
   background: none; border: 0; cursor: pointer;
-  color: var(--ink-3); font-size: .66rem; font-family: inherit; font-weight: 600;
+  color: var(--ink-3); font-size: .62rem; font-family: inherit; font-weight: 600;
 }
 .tab span { font-size: 1.05rem; line-height: 1; }
 .tab[aria-current="page"] { color: var(--accent); }
 
 @media (min-width: 900px) {
+  .only-phone { display: none; }
   .app { flex-direction: row; flex-wrap: wrap; }
   .topbar { flex: 1 0 100%; }
   .tabbar { display: none; }
@@ -388,3 +389,58 @@ pre.summary {
 @media (prefers-reduced-motion: reduce) {
   * { animation: none !important; transition: none !important; }
 }
+
+/* ---------- packing checklist ---------- */
+
+.meter {
+  height: 8px; border-radius: 999px; background: var(--surface-2);
+  overflow: hidden; border: 1px solid var(--line);
+}
+.meter > span { display: block; height: 100%; background: var(--ok); transition: width .25s ease; }
+:root[data-contrast="sunlight"] .meter > span { background: var(--accent); }
+
+ul.checklist li { border-bottom: 1px solid var(--line); }
+ul.checklist li:last-child { border-bottom: 0; }
+ul.checklist label {
+  display: flex; align-items: flex-start; gap: .7rem;
+  padding: .55rem .1rem; min-height: var(--tap); cursor: pointer;
+}
+ul.checklist input[type="checkbox"] {
+  width: 22px; height: 22px; min-height: 22px; flex: none; margin-top: .15rem;
+  accent-color: var(--accent);
+}
+ul.checklist .is-packed { color: var(--ink-3); text-decoration: line-through; }
+
+/* ---------- route map ---------- */
+
+.routemap {
+  display: block; width: 100%; height: auto;
+  background: var(--surface-2); border-radius: var(--radius-sm);
+  border: 1px solid var(--line);
+}
+.routemap .m-route {
+  stroke: var(--accent); stroke-width: 4;
+  stroke-linejoin: round; stroke-linecap: round;
+  stroke-dasharray: 10 7;
+}
+.routemap circle { stroke: var(--surface); stroke-width: 3; }
+.routemap .m-stay { fill: var(--accent); }
+.routemap .m-charge { fill: var(--ok); }
+.routemap .m-other { fill: var(--ink-3); }
+.routemap .m-label {
+  fill: var(--ink); font-size: 26px; font-weight: 650;
+  font-family: var(--font); paint-order: stroke;
+  stroke: var(--surface-2); stroke-width: 5px; stroke-linejoin: round;
+}
+
+.map-legend {
+  display: flex; flex-wrap: wrap; align-items: center; gap: .35rem 1rem;
+  margin: .7rem 0 .2rem; font-size: .8rem; color: var(--ink-2);
+}
+.map-legend .key {
+  display: inline-block; width: .7rem; height: .7rem; border-radius: 50%;
+  margin-right: .25rem; vertical-align: -1px;
+}
+.map-legend .k-stay { background: var(--accent); }
+.map-legend .k-charge { background: var(--ok); }
+.map-legend .k-other { background: var(--ink-3); }

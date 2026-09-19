@@ -9,7 +9,7 @@
 //     never cached. Those responses carry tokens and personal data, and a
 //     stale answer would be worse than an honest failure.
 
-const VERSION = 'v1';
+const VERSION = 'v2';
 const SHELL_CACHE = `trip-shell-${VERSION}`;
 const DATA_CACHE = `trip-data-${VERSION}`;
 

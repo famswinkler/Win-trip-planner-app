@@ -45,6 +45,8 @@ Once installed it launches full screen and works in flight mode.
 | **Plan** | The full day-by-day timeline. Tap Edit on anything to change it |
 | **Bookings** | Confirmations, check-in windows, cancellation terms, contacts |
 | **Money** | The budget. Tap a status to cycle due → paid → optional |
+| **Route** | The drive drawn from saved coordinates, plus every stop in order |
+| **Packing** | A tickable list that remembers what is already in the car |
 | **Summary** | The whole trip as plain bullet points: copy, share or print |
 | **Ask** | Gemini, grounded in your trip. Falls back to local search offline |
 | **Setup** | Keys, Google sync, import/export, theme |
@@ -52,10 +54,23 @@ Once installed it launches full screen and works in flight mode.
 Editing works offline. Changes are saved to the device the moment you make
 them, and there is nothing to "sync back" — this copy is the real one.
 
+## The route map
+
+Drawn as inline SVG from the trip's own coordinates, with no tile library.
+Tiles need the network, which is the one thing this app assumes it will not
+have; a route diagram works in a tunnel. Coordinates are town-level and exist
+to draw the picture — real navigation is handed to Apple or Google Maps through
+the link on each stop.
+
 ## Optional: Gemini assistant
 
 1. Get a key at [aistudio.google.com](https://aistudio.google.com/apikey).
 2. Setup → Gemini assistant → paste the key.
+
+The default model is `gemini-3.6-flash`. Older ids such as `gemini-2.5-flash`
+are refused for new keys, so a stored setting naming one is upgraded on load.
+Current models spend "thinking" tokens from the same budget as the reply, which
+is why the output ceiling is set high.
 
 The key is stored in this browser only and is never committed anywhere. Anyone
 with the key can spend your quota, so clear it if you lend the device. The
