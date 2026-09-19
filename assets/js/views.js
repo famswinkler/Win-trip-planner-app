@@ -3,7 +3,7 @@
 // after any edit without tracking which node changed.
 
 import {
-  byStart, chf, dayKey, esc, eur, fmtDayLong, fmtDayShort, fmtTime, kindGlyph,
+  byStart, chf, dayKey, esc, eur, fmtDateRange, fmtDayLong, fmtDayShort, fmtTime, kindGlyph,
   kindLabel, mapLinks, parseDate, relativeWhen, ITEM_TYPES,
 } from './util.js';
 import { buildSummary } from './summary.js';
@@ -324,10 +324,27 @@ export function renderAsk(state) {
 }
 
 export function renderSettings(state) {
-  const { settings, sync, storage, trip, online } = state;
+  const { settings, sync, storage, trip, trips, online } = state;
   const last = sync?.lastSync ? new Date(sync.lastSync).toLocaleString('en-GB') : 'never';
+  const tz = trip.timezone || 'Europe/Zurich';
+
+  const tripOptions = (trips || [])
+    .map((t) => `<option value="${esc(t.id)}"${t.id === trip.id ? ' selected' : ''}>${esc(t.title)} — ${esc(fmtDateRange(t.start, t.end, tz))}</option>`)
+    .join('');
 
   return `
+    <section class="card">
+      <div class="card-head"><h2>Trips</h2><span class="spacer"></span>
+        <span class="chip">${(trips || []).length} saved</span>
+      </div>
+      <label class="field">
+        <span>Showing</span>
+        <select id="activeTrip">${tripOptions}</select>
+      </label>
+      <p class="muted small">Import another trip file to add it here. Switching keeps every trip on the device, so last year's details stay available.</p>
+      <div class="btn-row"><button class="btn danger small" data-delete-trip type="button">Delete this trip</button></div>
+    </section>
+
     <section class="card">
       <div class="card-head"><h2>Trip data</h2></div>
       <p class="muted small">Everything is stored on this device. ${esc(storage.backend)} storage${storage.persisted ? ', marked persistent' : ''}.</p>
@@ -384,6 +401,18 @@ export function renderSettings(state) {
           <option value="light"${settings.theme === 'light' ? ' selected' : ''}>Light</option>
           <option value="dark"${settings.theme === 'dark' ? ' selected' : ''}>Dark</option>
         </select>
+      </label>
+      <label class="field">
+        <span>Text size</span>
+        <select id="textScale">
+          <option value="normal"${settings.textScale === 'normal' ? ' selected' : ''}>Normal</option>
+          <option value="large"${settings.textScale === 'large' ? ' selected' : ''}>Large</option>
+          <option value="xlarge"${settings.textScale === 'xlarge' ? ' selected' : ''}>Extra large</option>
+        </select>
+      </label>
+      <label class="field" style="display:flex;align-items:center;gap:.6rem">
+        <input type="checkbox" id="sunlight" style="width:auto;min-height:auto"${settings.sunlight ? ' checked' : ''}>
+        <span style="margin:0">Sunlight mode — maximum contrast for bright daylight</span>
       </label>
       <p class="muted small">Trip last changed ${esc(trip.updatedAt ? new Date(trip.updatedAt).toLocaleString('en-GB') : 'unknown')}.</p>
     </section>

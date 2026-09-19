@@ -14,6 +14,7 @@ const ROUTES = Object.keys(VIEWS);
 const state = {
   route: 'now',
   trip: null,
+  trips: [],
   settings: { ...store.DEFAULT_SETTINGS },
   chat: [],
   suggestions: [],
@@ -31,10 +32,11 @@ const state = {
 
 async function boot() {
   state.settings = await store.loadSettings();
-  applyTheme(state.settings.theme);
+  applyAppearance(state.settings);
 
   state.trip = await store.loadTrip();
   if (!state.trip) state.trip = await loadSeed();
+  state.trips = await store.loadTrips();
 
   state.chat = await store.loadChat();
   state.suggestions = await store.loadSuggestions();
@@ -85,10 +87,17 @@ async function loadSeed() {
   }
 }
 
-function applyTheme(theme) {
+function applyAppearance(settings) {
   const root = document.documentElement;
+  const theme = settings.theme;
   if (theme === 'light' || theme === 'dark') root.dataset.theme = theme;
   else delete root.dataset.theme;
+
+  if (settings.sunlight) root.dataset.contrast = 'sunlight';
+  else delete root.dataset.contrast;
+
+  if (settings.textScale && settings.textScale !== 'normal') root.dataset.text = settings.textScale;
+  else delete root.dataset.text;
 }
 
 function registerServiceWorker() {
@@ -240,6 +249,7 @@ async function onClick(event) {
   if ('reloadSeed' in d) {
     if (!confirm('Replace the trip on this device with the version shipped in the app? Your edits will be lost.')) return;
     state.trip = await loadSeed();
+    state.trips = await store.loadTrips();
     render();
     toast('Trip reset');
     return;
@@ -249,6 +259,20 @@ async function onClick(event) {
     state.settings = await store.saveSettings({ geminiKey: '' });
     render();
     toast('Gemini key cleared');
+    return;
+  }
+
+  if ('deleteTrip' in d) {
+    if (!confirm(`Delete "${state.trip.title}" from this device?`)) return;
+    try {
+      await store.deleteTrip(state.trip.id);
+      state.trip = await store.loadTrip();
+      state.trips = await store.loadTrips();
+      render();
+      toast('Trip deleted');
+    } catch (err) {
+      toast(err.message);
+    }
     return;
   }
 
@@ -284,7 +308,26 @@ async function onChange(event) {
   const el = event.target;
   if (el.id === 'theme') {
     state.settings = await store.saveSettings({ theme: el.value });
-    applyTheme(el.value);
+    applyAppearance(state.settings);
+    return;
+  }
+  if (el.id === 'textScale') {
+    state.settings = await store.saveSettings({ textScale: el.value });
+    applyAppearance(state.settings);
+    return;
+  }
+  if (el.id === 'sunlight') {
+    state.settings = await store.saveSettings({ sunlight: el.checked });
+    applyAppearance(state.settings);
+    return;
+  }
+  if (el.id === 'activeTrip') {
+    await store.setActiveTrip(el.value);
+    state.trip = await store.loadTrip();
+    state.suggestions = [];
+    await store.saveSuggestions([]);
+    render();
+    toast(`Switched to ${state.trip.title}`);
     return;
   }
   if (['geminiKey', 'geminiModel', 'googleClientId', 'gmailQuery'].includes(el.id)) {
@@ -296,6 +339,7 @@ async function onChange(event) {
     try {
       const text = await el.files[0].text();
       state.trip = await store.importBundle(JSON.parse(text));
+      state.trips = await store.loadTrips();
       state.showPrivate = true;
       render();
       toast('Trip imported');
@@ -367,6 +411,7 @@ function fromLocalInput(value) {
 
 async function persistTrip() {
   await store.saveTrip(state.trip);
+  state.trips = await store.loadTrips();
   render();
 }
 

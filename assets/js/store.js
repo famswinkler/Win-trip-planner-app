@@ -147,7 +147,9 @@ export async function estimateUsage() {
 // Typed accessors. Keeping the key names in one place avoids typo-shaped bugs.
 
 export const KEYS = {
-  trip: 'trip',
+  trip: 'trip',            // legacy single-trip key, migrated on first read
+  trips: 'trips',
+  activeTripId: 'activeTripId',
   settings: 'settings',
   chat: 'chat',
   suggestions: 'suggestions',
@@ -157,6 +159,8 @@ export const KEYS = {
 
 export const DEFAULT_SETTINGS = {
   theme: 'auto',
+  sunlight: false,        // high-contrast mode for bright daylight
+  textScale: 'normal',    // normal | large | xlarge
   geminiKey: '',
   geminiModel: 'gemini-2.5-flash',
   googleClientId: '',
@@ -175,12 +179,63 @@ export async function saveSettings(patch) {
   return next;
 }
 
-export async function loadTrip() { return get(KEYS.trip, null); }
+/**
+ * All trips, newest first. Migrates the original single-trip key so an
+ * existing install keeps its data when it gains multi-trip support.
+ */
+export async function loadTrips() {
+  const trips = await get(KEYS.trips, null);
+  if (Array.isArray(trips) && trips.length) return trips;
+  const legacy = await get(KEYS.trip, null);
+  if (legacy && Array.isArray(legacy.items)) {
+    await set(KEYS.trips, [legacy]);
+    await set(KEYS.activeTripId, legacy.id);
+    return [legacy];
+  }
+  return [];
+}
 
+export async function saveTrips(trips) {
+  await set(KEYS.trips, trips);
+  return trips;
+}
+
+export async function activeTripId() {
+  return get(KEYS.activeTripId, null);
+}
+
+export async function setActiveTrip(id) {
+  await set(KEYS.activeTripId, id);
+  return id;
+}
+
+/** The trip currently being shown, or null when none is stored yet. */
+export async function loadTrip() {
+  const trips = await loadTrips();
+  if (!trips.length) return null;
+  const id = await activeTripId();
+  return trips.find((t) => t.id === id) || trips[0];
+}
+
+/** Save one trip back into the collection, adding it if it is new. */
 export async function saveTrip(trip) {
   trip.updatedAt = new Date().toISOString();
-  await set(KEYS.trip, trip);
+  const trips = await loadTrips();
+  const idx = trips.findIndex((t) => t.id === trip.id);
+  if (idx >= 0) trips[idx] = trip; else trips.unshift(trip);
+  await saveTrips(trips);
+  await set(KEYS.activeTripId, trip.id);
   return trip;
+}
+
+/** Remove a trip. Refuses to delete the last one, so the app always has data. */
+export async function deleteTrip(id) {
+  const trips = await loadTrips();
+  if (trips.length <= 1) throw new Error('This is your only trip.');
+  const next = trips.filter((t) => t.id !== id);
+  await saveTrips(next);
+  if ((await activeTripId()) === id) await set(KEYS.activeTripId, next[0].id);
+  return next;
 }
 
 export async function loadChat() { return get(KEYS.chat, []); }
@@ -199,6 +254,7 @@ export async function exportAll() {
   return {
     exportedAt: new Date().toISOString(),
     trip: await loadTrip(),
+    trips: await loadTrips(),
     settings: { ...(await loadSettings()), geminiKey: '', googleClientId: '' },
     chat: await loadChat(),
   };
@@ -211,9 +267,14 @@ export async function exportAll() {
  */
 export async function importBundle(bundle) {
   if (!bundle || typeof bundle !== 'object') throw new Error('Not a valid file.');
-  const trip = bundle.trip ?? (bundle.items ? bundle : null);
-  if (!trip || !Array.isArray(trip.items)) throw new Error('No trip found in that file.');
-  await saveTrip(trip);
+  const incoming = Array.isArray(bundle.trips) && bundle.trips.length
+    ? bundle.trips
+    : [bundle.trip ?? (bundle.items ? bundle : null)].filter(Boolean);
+  const valid = incoming.filter((t) => t && Array.isArray(t.items));
+  if (!valid.length) throw new Error('No trip found in that file.');
+  // A trip with a known id updates in place; a new id is added alongside.
+  let last = null;
+  for (const trip of valid) last = await saveTrip(trip);
   if (Array.isArray(bundle.chat)) await saveChat(bundle.chat);
-  return trip;
+  return last;
 }

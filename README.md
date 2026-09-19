@@ -96,11 +96,22 @@ Setup → Trip data → Import file
 `data/private.example.json` shows the shape. Keep your filled-in copy out of
 git; `.gitignore` already excludes `data/private*.json`.
 
-## Adding another trip
+## More than one trip
 
-Copy `data/trip-spain-2026.json`, edit it, and import it through Setup. The
-shape is documented by example; the only required fields are `title`, `start`,
-`end` and an `items` array where each item has an `id`, a `title` and a `start`.
+The app holds as many trips as you like. Copy `data/trip-spain-2026.json`, edit
+it, give it a new `id`, and import it through Setup → Trips. Switch between
+them with the picker; every trip stays on the device, so last year's details
+remain available. Importing a file whose `id` already exists updates that trip
+in place rather than adding a duplicate.
+
+Required fields are `title`, `start`, `end` and an `items` array where each
+item has an `id`, a `title` and a `start`.
+
+## Reading it outdoors
+
+Setup → Appearance has a **sunlight mode**: black on white, heavier borders,
+no shadows, for reading at a motorway charger in direct sun. Text size has
+three steps on top of whatever your device is set to.
 
 ## Tests
 

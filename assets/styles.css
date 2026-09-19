@@ -65,6 +65,42 @@
   --shadow: 0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.35);
 }
 
+/* Sunlight mode: maximum contrast for reading at a motorway charger in
+   direct sun. Deliberately not just "light theme" — borders and weights go up
+   too, because thin grey hairlines vanish outdoors. */
+:root[data-contrast="sunlight"] {
+  --bg: #ffffff;
+  --surface: #ffffff;
+  --surface-2: #f0f0f0;
+  --ink: #000000;
+  --ink-2: #2b2b2b;
+  --ink-3: #454545;
+  --line: #8a8a8a;
+  --accent: #0b3ea8;
+  --accent-ink: #ffffff;
+  --ok: #04562c;
+  --warn: #6b3b00;
+  --danger: #8c0f09;
+  --ok-bg: #d8f0e2;
+  --warn-bg: #fceccb;
+  --danger-bg: #fadbd9;
+  --shadow: none;
+}
+:root[data-contrast="sunlight"] .card,
+:root[data-contrast="sunlight"] .item,
+:root[data-contrast="sunlight"] pre.summary { border-width: 2px; }
+:root[data-contrast="sunlight"] .muted,
+:root[data-contrast="sunlight"] .item-meta,
+:root[data-contrast="sunlight"] .small { color: var(--ink-2); }
+:root[data-contrast="sunlight"] .btn { border-width: 2px; font-weight: 700; }
+:root[data-contrast="sunlight"] .chip { font-weight: 700; border: 1px solid currentColor; }
+:root[data-contrast="sunlight"] .topbar,
+:root[data-contrast="sunlight"] .tabbar { backdrop-filter: none; background: #ffffff; }
+
+/* Text size. Set on :root so every rem-based size scales together. */
+:root[data-text="large"] { font-size: 18px; }
+:root[data-text="xlarge"] { font-size: 20px; }
+
 * { box-sizing: border-box; }
 
 html { -webkit-text-size-adjust: 100%; }
@@ -74,7 +110,7 @@ body {
   background: var(--bg);
   color: var(--ink);
   font-family: var(--font);
-  font-size: 16px;
+  font-size: 1rem;
   line-height: 1.5;
   overscroll-behavior-y: none;
 }
