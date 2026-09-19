@@ -156,6 +156,7 @@ export const KEYS = {
   chat: 'chat',
   suggestions: 'suggestions',
   sync: 'syncState',
+  syncBase: 'syncBase',
   seenMail: 'seenMailIds',
 };
 
@@ -167,6 +168,7 @@ export const DEFAULT_SETTINGS = {
   geminiModel: DEFAULT_MODEL,
   googleClientId: '',
   autoSync: true,
+  driveSync: false,        // device-to-device sync via the Drive app folder
   gmailQuery: '',
 };
 
@@ -250,9 +252,17 @@ export async function loadSuggestions() { return get(KEYS.suggestions, []); }
 export async function saveSuggestions(list) { return set(KEYS.suggestions, list.slice(0, 40)); }
 
 export async function loadSyncState() {
-  return get(KEYS.sync, { lastSync: null, lastError: null, counts: null });
+  return get(KEYS.sync, { lastSync: null, lastError: null, counts: null, lastDriveSync: null });
 }
 export async function saveSyncState(state) { return set(KEYS.sync, state); }
+
+/**
+ * Snapshot of each trip's updatedAt as of the last successful device sync.
+ * Without it the merge cannot tell a remote edit from a local one and
+ * degenerates into last-write-wins.
+ */
+export async function loadSyncBase() { return get(KEYS.syncBase, {}); }
+export async function saveSyncBase(base) { return set(KEYS.syncBase, base); }
 
 /** Full export for backup, or to move the trip to another device. */
 export async function exportAll() {

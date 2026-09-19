@@ -4,9 +4,11 @@ import * as store from './store.js';
 import * as google from './google.js';
 import { askGemini, GeminiError, offlineAnswer } from './gemini.js';
 import { defaultGmailQuery, suggestionsFromCalendar, suggestionsFromMail } from './ingest.js';
+import { DriveSyncError, syncOnce } from './drivesync.js';
+import { differsFrom } from './merge.js';
 import { buildAiContext, buildSummary } from './summary.js';
 import { renderEditor, renderInbox, VIEWS } from './views.js';
-import { $, clone, copyText, fmtDateRange, parseDate, uid } from './util.js';
+import { $, clone, copyText, debounce, esc, fmtDateRange, parseDate, uid } from './util.js';
 
 const SEED_URL = 'data/trip-spain-2026.json';
 const ROUTES = Object.keys(VIEWS);
@@ -19,6 +21,8 @@ const state = {
   chat: [],
   suggestions: [],
   sync: { lastSync: null, lastError: null },
+  syncBase: {},
+  pendingConflicts: [],
   seenMail: [],
   online: navigator.onLine,
   now: new Date(),
@@ -41,6 +45,7 @@ async function boot() {
   state.chat = await store.loadChat();
   state.suggestions = await store.loadSuggestions();
   state.sync = await store.loadSyncState();
+  state.syncBase = await store.loadSyncBase();
   state.seenMail = await store.get(store.KEYS.seenMail, []);
   state.storage = {
     backend: store.storageBackend(),
@@ -185,7 +190,7 @@ function wireChrome() {
 }
 
 async function onClick(event) {
-  const t = event.target.closest('[data-route],[data-copy],[data-edit],[data-done],[data-add-item],[data-copy-summary],[data-share-summary],[data-print],[data-toggle-private],[data-toggle-paid],[data-ask],[data-clear-chat],[data-export],[data-reload-seed],[data-clear-key],[data-connect],[data-disconnect],[data-accept],[data-dismiss],[data-pack-reset],[data-delete-trip]');
+  const t = event.target.closest('[data-route],[data-copy],[data-edit],[data-done],[data-add-item],[data-copy-summary],[data-share-summary],[data-print],[data-toggle-private],[data-toggle-paid],[data-ask],[data-clear-chat],[data-export],[data-reload-seed],[data-clear-key],[data-connect],[data-disconnect],[data-accept],[data-dismiss],[data-pack-reset],[data-delete-trip],[data-sync-devices]');
   if (!t) return;
   const d = t.dataset;
 
@@ -283,6 +288,19 @@ async function onClick(event) {
     return;
   }
 
+  if ('syncDevices' in d) {
+    try {
+      await syncDevices({ silent: false });
+    } catch (err) {
+      const msg = err instanceof DriveSyncError ? err.message : (err.message || 'Sync failed');
+      toast(msg);
+      state.sync = { ...state.sync, lastError: msg };
+      await store.saveSyncState(state.sync);
+      render();
+    }
+    return;
+  }
+
   if ('connect' in d) { await connectGoogle(); return; }
 
   if ('disconnect' in d) {
@@ -326,6 +344,14 @@ async function onChange(event) {
   if (el.id === 'sunlight') {
     state.settings = await store.saveSettings({ sunlight: el.checked });
     applyAppearance(state.settings);
+    return;
+  }
+  if (el.id === 'driveSync') {
+    state.settings = await store.saveSettings({ driveSync: el.checked });
+    render();
+    if (el.checked && state.online) {
+      try { await syncDevices({ silent: false }); } catch (err) { toast(err.message); }
+    }
     return;
   }
   if (el.id === 'activeTrip') {
@@ -429,10 +455,18 @@ function fromLocalInput(value) {
   return Number.isNaN(d.getTime()) ? '' : d.toISOString();
 }
 
+const queueDeviceSync = debounce(() => {
+  if (!state.settings.driveSync || !state.online) return;
+  // Background push: a failure here is not worth interrupting the user for,
+  // and the next manual sync or app start will retry.
+  syncDevices({ silent: true }).catch(() => {});
+}, 8000);
+
 async function persistTrip() {
   await store.saveTrip(state.trip);
   state.trips = await store.loadTrips();
   render();
+  queueDeviceSync();
 }
 
 // ---------------------------------------------------------------------------
@@ -530,7 +564,15 @@ async function syncAll({ silent }) {
       await store.set(store.KEYS.seenMail, state.seenMail);
     } catch (err) { errors.push(`Gmail: ${err.message}`); }
 
+    // Device-to-device sync via the Drive app folder.
+    if (state.settings.driveSync) {
+      try {
+        await syncDevices({ silent: true });
+      } catch (err) { errors.push(`Device sync: ${err.message}`); }
+    }
+
     state.sync = {
+      ...state.sync,
       lastSync: new Date().toISOString(),
       lastError: errors.length ? errors.join(' · ') : null,
     };
@@ -546,6 +588,105 @@ async function syncAll({ silent }) {
   } finally {
     state.syncing = false;
     render();
+  }
+}
+
+/**
+ * Merge this device's trips with the copy in the Drive app folder.
+ *
+ * Conflicts stop the upload and raise a dialog rather than resolving
+ * themselves: picking a winner silently is how a week of edits disappears.
+ */
+async function syncDevices({ silent = false, choices = null } = {}) {
+  if (!state.settings.driveSync) {
+    if (!silent) toast('Turn on device sync in Setup first');
+    return;
+  }
+  if (!state.online) {
+    if (!silent) toast('You are offline');
+    return;
+  }
+
+  const token = await google.authorize(state.settings.googleClientId, { interactive: !silent });
+  const result = await syncOnce({
+    token,
+    localTrips: await store.loadTrips(),
+    base: state.syncBase,
+    choices: choices || {},
+  });
+
+  if (result.conflicts.length) {
+    state.pendingConflicts = result.conflicts;
+    openConflictDialog(result);
+    return;
+  }
+
+  const before = await store.loadTrips();
+  if (differsFrom(before, result.trips)) {
+    await store.saveTrips(result.trips);
+    const active = result.trips.find((t) => t.id === state.trip?.id) || result.trips[0];
+    if (active) {
+      await store.setActiveTrip(active.id);
+      state.trip = active;
+    }
+    state.trips = result.trips;
+  }
+
+  state.syncBase = result.base;
+  state.pendingConflicts = [];
+  await store.saveSyncBase(state.syncBase);
+  state.sync = { ...state.sync, lastDriveSync: new Date().toISOString() };
+  await store.saveSyncState(state.sync);
+
+  if (!silent) {
+    toast(result.uploaded ? 'Devices in sync' : 'Nothing to sync');
+  }
+  render();
+}
+
+function openConflictDialog(result) {
+  const other = result.remoteDevice ? `another device (${result.remoteDevice})` : 'another device';
+  $('#conflictIntro').textContent =
+    `These trips changed here and on ${other} since the last sync. Nothing is uploaded until you choose.`;
+  $('#conflictBody').innerHTML = result.conflicts.map((c) => {
+    const l = c.local, r = c.remote;
+    const label = (t, fallback) => t
+      ? `${esc(t.title || c.id)} — changed ${new Date(t.updatedAt).toLocaleString('en-GB')}`
+      : fallback;
+    return `
+      <fieldset style="border:1px solid var(--line);border-radius:var(--radius-sm);padding:.7rem;margin:0 0 .7rem">
+        <legend class="small muted">${esc(c.local?.title || c.remote?.title || c.id)}</legend>
+        <label class="field" style="display:flex;gap:.6rem;align-items:flex-start">
+          <input type="radio" name="c-${esc(c.id)}" value="local" checked style="width:auto;min-height:auto;margin-top:.3rem">
+          <span style="margin:0">This device: ${label(l, 'deleted here')}</span>
+        </label>
+        <label class="field" style="display:flex;gap:.6rem;align-items:flex-start;margin-bottom:0">
+          <input type="radio" name="c-${esc(c.id)}" value="remote" style="width:auto;min-height:auto;margin-top:.3rem">
+          <span style="margin:0">Other device: ${label(r, 'deleted there')}</span>
+        </label>
+      </fieldset>`;
+  }).join('');
+
+  const dialog = $('#conflict');
+  dialog.showModal();
+  dialog.addEventListener('close', onConflictClose, { once: true });
+}
+
+async function onConflictClose() {
+  if ($('#conflict').returnValue !== 'apply') {
+    toast('Sync paused until you decide');
+    return;
+  }
+  const form = $('#conflictForm');
+  const choices = {};
+  for (const c of state.pendingConflicts) {
+    const picked = form.querySelector(`input[name="c-${CSS.escape(c.id)}"]:checked`);
+    choices[c.id] = picked ? picked.value : 'local';
+  }
+  try {
+    await syncDevices({ silent: false, choices });
+  } catch (err) {
+    toast(err.message || 'Sync failed');
   }
 }
 

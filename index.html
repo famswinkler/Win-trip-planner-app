@@ -80,6 +80,18 @@
   </form>
 </dialog>
 
+<dialog id="conflict" class="sheet">
+  <form method="dialog" id="conflictForm">
+    <h2>Two devices changed the same trip</h2>
+    <p class="muted small" id="conflictIntro"></p>
+    <div id="conflictBody" class="sheet-body"></div>
+    <menu class="sheet-actions">
+      <button value="cancel" class="btn ghost" type="submit">Decide later</button>
+      <button value="apply" class="btn primary" type="submit">Apply</button>
+    </menu>
+  </form>
+</dialog>
+
 <script type="module" src="assets/js/app.js"></script>
 <noscript><p style="padding:2rem">This app needs JavaScript.</p></noscript>
 </body>

@@ -9,7 +9,7 @@
 //     never cached. Those responses carry tokens and personal data, and a
 //     stale answer would be worse than an honest failure.
 
-const VERSION = 'v2';
+const VERSION = 'v3';
 const SHELL_CACHE = `trip-shell-${VERSION}`;
 const DATA_CACHE = `trip-data-${VERSION}`;
 
@@ -26,6 +26,8 @@ const SHELL = [
   'assets/js/gemini.js',
   'assets/js/google.js',
   'assets/js/ingest.js',
+  'assets/js/drivesync.js',
+  'assets/js/merge.js',
   'assets/icons/icon-192.png',
   'assets/icons/icon-512.png',
   'assets/icons/icon-180.png',

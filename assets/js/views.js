@@ -520,6 +520,7 @@ function shortPlace(title) {
 export function renderSettings(state) {
   const { settings, sync, storage, trip, trips, online } = state;
   const last = sync?.lastSync ? new Date(sync.lastSync).toLocaleString('en-GB') : 'never';
+  const lastDrive = sync?.lastDriveSync ? new Date(sync.lastDriveSync).toLocaleString('en-GB') : 'never';
   const tz = trip.timezone || 'Europe/Zurich';
 
   const tripOptions = (trips || [])
@@ -584,6 +585,28 @@ export function renderSettings(state) {
         <button class="btn ghost" data-disconnect type="button">Disconnect</button>
       </div>
       <p class="muted small" style="margin-top:.6rem">Read-only access to Gmail, Calendar and Drive. Sync proposes changes; it never edits your trip on its own.</p>
+    </section>
+
+    <section class="card">
+      <div class="card-head"><h2>Sync across your devices</h2><span class="spacer"></span>
+        ${settings.driveSync ? '<span class="chip ok">on</span>' : '<span class="chip">off</span>'}
+      </div>
+      <label class="field" style="display:flex;align-items:center;gap:.6rem">
+        <input type="checkbox" id="driveSync" style="width:auto;min-height:auto"${settings.driveSync ? ' checked' : ''}>
+        <span style="margin:0">Keep this iPhone, iPad and Mac in step</span>
+      </label>
+      <p class="muted small">
+        Trips are mirrored through a private folder in your Google Drive that only this app can
+        see. It does not appear among your files and gives the app no access to anything else.
+        Your device keeps the real copy, so everything still works with no connection.
+      </p>
+      <p class="muted small">Last device sync: ${esc(lastDrive)}</p>
+      <div class="btn-row">
+        <button class="btn" data-sync-devices type="button"${settings.driveSync ? '' : ' disabled'}>Sync now</button>
+      </div>
+      <p class="muted small" style="margin-top:.6rem">
+        If the same trip changed in two places, the app asks which to keep rather than picking one.
+      </p>
     </section>
 
     <section class="card">

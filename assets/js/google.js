@@ -13,6 +13,9 @@ const SCOPES = [
   'https://www.googleapis.com/auth/gmail.readonly',
   'https://www.googleapis.com/auth/calendar.readonly',
   'https://www.googleapis.com/auth/drive.readonly',
+  // Private per-app folder used for device-to-device sync. It is invisible in
+  // the user's Drive and grants no access to their other files.
+  'https://www.googleapis.com/auth/drive.appdata',
 ].join(' ');
 
 let gisPromise = null;
@@ -38,6 +41,11 @@ function loadGis() {
     document.head.appendChild(script);
   });
   return gisPromise;
+}
+
+/** The live access token, or null when not signed in. Used by the sync module. */
+export function currentToken() {
+  return isSignedIn() ? accessToken : null;
 }
 
 export function isSignedIn() {

@@ -111,6 +111,29 @@ Setup → Trip data → Import file
 `data/private.example.json` shows the shape. Keep your filled-in copy out of
 git; `.gitignore` already excludes `data/private*.json`.
 
+## Syncing your iPhone, iPad and Mac
+
+Setup → Sync across your devices. Trips are mirrored through a private folder
+in your Google Drive that only this app can see. It does not show up among your
+files, and the `drive.appdata` scope gives the app no access to anything else
+in Drive.
+
+The device keeps the real copy; Drive is only the meeting point. Everything
+still works with no connection, and the next sync catches up.
+
+Merging is three-way, against a snapshot of each trip taken at the last
+successful sync. That snapshot is what lets the app tell "the other device
+changed this" from "I have not changed it yet" — without it, sync degenerates
+into last-write-wins and quietly loses edits. If the same trip changed in two
+places, nothing is uploaded and the app asks which to keep. A trip deleted on
+one device but edited on the other is always kept, not deleted.
+
+You still need the OAuth client ID from the section above, and you must
+reconnect once after enabling this so Google grants the extra scope.
+
+Export and import remain as the manual fallback, which needs no connection to
+Google at all.
+
 ## More than one trip
 
 The app holds as many trips as you like. Copy `data/trip-spain-2026.json`, edit
@@ -131,8 +154,12 @@ three steps on top of whatever your device is set to.
 ## Tests
 
 ```bash
-node --test tests/app.test.mjs
+node --test 'tests/*.test.mjs'
 ```
 
-Covers the data model, HTML escaping, the summary generator, email and calendar
-parsing, and the rule that no credentials appear in the committed seed.
+- `app.test.mjs` — data model, HTML escaping, the summary generator, email and
+  calendar parsing, and the rule that no credentials appear in the seed.
+- `merge.test.mjs` — the three-way sync merge: edits on one side, edits on
+  both, creations, deletions, and delete-versus-edit.
+- `drivesync.test.mjs` — the Drive transport against a mock app folder,
+  including a two-device round trip and every error path.
