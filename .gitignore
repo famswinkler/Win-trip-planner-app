@@ -1,0 +1,8 @@
+node_modules/
+.DS_Store
+*.log
+
+# Personal data must never be committed to a public repository.
+data/private*.json
+data/*-private.json
+!data/private.example.json

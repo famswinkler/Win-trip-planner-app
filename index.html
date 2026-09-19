@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>Trip Companion</title>
+<meta name="description" content="Offline-first travel companion: itinerary, bookings, money and a Gemini assistant in one place." />
+<meta name="theme-color" content="#0b1220" media="(prefers-color-scheme: dark)" />
+<meta name="theme-color" content="#f5f6f8" media="(prefers-color-scheme: light)" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Trip" />
+<meta name="format-detection" content="telephone=yes" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="assets/icons/icon-180.png" />
+<link rel="icon" href="assets/icons/icon-192.png" />
+<link rel="stylesheet" href="assets/styles.css" />
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+
+<div id="app" class="app" hidden>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-text">
+          <strong id="tripTitle">Trip</strong>
+          <small id="tripDates"></small>
+        </span>
+      </div>
+      <div class="topbar-actions">
+        <span id="netBadge" class="badge" role="status" aria-live="polite">offline</span>
+        <button id="btnSync" class="icon-btn" type="button" title="Refresh from Google" aria-label="Refresh from Google">&#8635;</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="sidenav" aria-label="Sections">
+    <button class="nav-item" data-route="now" type="button"><span class="nav-ico" aria-hidden="true">&#9679;</span><span>Now</span></button>
+    <button class="nav-item" data-route="plan" type="button"><span class="nav-ico" aria-hidden="true">&#9776;</span><span>Plan</span></button>
+    <button class="nav-item" data-route="bookings" type="button"><span class="nav-ico" aria-hidden="true">&#9993;</span><span>Bookings</span></button>
+    <button class="nav-item" data-route="money" type="button"><span class="nav-ico" aria-hidden="true">&#8364;</span><span>Money</span></button>
+    <button class="nav-item" data-route="summary" type="button"><span class="nav-ico" aria-hidden="true">&#8801;</span><span>Summary</span></button>
+    <button class="nav-item" data-route="ask" type="button"><span class="nav-ico" aria-hidden="true">&#9734;</span><span>Ask</span></button>
+    <button class="nav-item" data-route="settings" type="button"><span class="nav-ico" aria-hidden="true">&#9881;</span><span>Setup</span></button>
+  </nav>
+
+  <main id="main" class="main" tabindex="-1">
+    <div id="inbox" class="inbox" hidden></div>
+    <div id="view" class="view" aria-live="polite"></div>
+  </main>
+
+  <nav class="tabbar" aria-label="Sections">
+    <button class="tab" data-route="now" type="button"><span aria-hidden="true">&#9679;</span>Now</button>
+    <button class="tab" data-route="plan" type="button"><span aria-hidden="true">&#9776;</span>Plan</button>
+    <button class="tab" data-route="summary" type="button"><span aria-hidden="true">&#8801;</span>Summary</button>
+    <button class="tab" data-route="ask" type="button"><span aria-hidden="true">&#9734;</span>Ask</button>
+    <button class="tab" data-route="settings" type="button"><span aria-hidden="true">&#9881;</span>Setup</button>
+  </nav>
+</div>
+
+<div id="boot" class="boot"><p>Loading your trip…</p></div>
+<div id="toast" class="toast" role="status" aria-live="polite" hidden></div>
+
+<dialog id="editor" class="sheet">
+  <form method="dialog" id="editorForm">
+    <h2 id="editorTitle">Edit</h2>
+    <div id="editorBody" class="sheet-body"></div>
+    <menu class="sheet-actions">
+      <button value="cancel" class="btn ghost" type="submit">Cancel</button>
+      <button value="delete" class="btn danger" type="submit" id="editorDelete">Delete</button>
+      <button value="save" class="btn primary" type="submit">Save</button>
+    </menu>
+  </form>
+</dialog>
+
+<script type="module" src="assets/js/app.js"></script>
+<noscript><p style="padding:2rem">This app needs JavaScript.</p></noscript>
+</body>
+</html>
